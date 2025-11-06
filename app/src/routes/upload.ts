@@ -3,6 +3,10 @@ import fs from "fs"
 import path from "path"
 import { exec } from "child_process";
 import AdmZip from "adm-zip";
+import { promisify } from "util";
+
+
+const execAsync = promisify(exec);
 
 export const uploadRoutes = new Elysia({prefix: "/upload"})
 .post("/upload", async({body}) =>{
@@ -13,34 +17,25 @@ export const uploadRoutes = new Elysia({prefix: "/upload"})
   const projectPath = path.join("projects", projectName)
   fs.mkdirSync(projectPath, { recursive: true });
   fs.mkdirSync("temp", { recursive: true });
-
   const tempPath = path.join("temp", file.name);
   const buffer = Buffer.from(await file.arrayBuffer());
   fs.writeFileSync(tempPath, buffer);
-  
   const zip = new AdmZip(tempPath);
   zip.extractAllTo(projectPath, true); 
-  
-  const possibleBuildDirs = ["build", "out"];
-  for (const dir of possibleBuildDirs) {
-      const buildPath = path.join(projectPath, dir);
-      if (fs.existsSync(buildPath)) {
-          const files = fs.readdirSync(buildPath);
-          for (const fileName of files) {
-              const src = path.join(buildPath, fileName);
-              const dest = path.join(projectPath, fileName);
-              fs.renameSync(src, dest); 
-          }
-          fs.rmdirSync(buildPath, { recursive: true });
-          break; 
-      }
+
+  try{
+    await execAsync("npm install", { cwd: projectPath });
+    await execAsync("npm run build", { cwd: projectPath });
+
+  }catch(error){
+    console.log("Failed while building Project", error)
   }
-  
+
   fs.unlinkSync(tempPath);
   
   const caddyConfig = `
   :8080 {
-      root * C:\\Users\\Henri\\Videos\\selfhostly\\app\\projects\\${projectName}
+      root * C:/Users/Henri/Videos/selfhostly/app/projects/${projectName}/${projectName}/out
       file_server
       try_files {path} /index.html
   }
@@ -58,7 +53,9 @@ export const uploadRoutes = new Elysia({prefix: "/upload"})
   return {success: true, done: true}
 },{
   body: t.Object({
-    file: t.File()
+    file: t.File({
+      maxSize: 600 * 1024 * 1024
+    })
   })
 })
 

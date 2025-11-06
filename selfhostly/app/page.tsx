@@ -133,26 +133,33 @@ export default function Home() {
               </div>
             ) : (
               <>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".zip"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <div className="space-y-3 text-center">
-                  <div className="flex justify-center">
-                    <Upload className="w-10 h-10 text-zinc-500" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-medium text-zinc-50">
-                      Drop your ZIP file here
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 rounded-lg p-12 cursor-pointer transition-all ${"border-dashed border-zinc-700 hover:border-zinc-600 bg-zinc-900/30"}`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".zip"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <div className="space-y-3 text-center">
+                    <div className="flex justify-center">
+                      <Upload className="w-10 h-10 text-zinc-500" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-medium text-zinc-50">
+                        Drop your ZIP file here
+                      </p>
+                      <p className="text-sm text-zinc-400">
+                        or click to browse
+                      </p>
+                    </div>
+                    <p className="text-xs text-zinc-500">
+                      Maximum file size: 5MB
                     </p>
-                    <p className="text-sm text-zinc-400">or click to browse</p>
                   </div>
-                  <p className="text-xs text-zinc-500">
-                    Maximum file size: 5MB
-                  </p>
                 </div>
 
                 {error && (
