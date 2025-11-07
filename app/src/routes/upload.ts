@@ -15,6 +15,7 @@ export const uploadRoutes = new Elysia({prefix: "/upload"})
   const projectName = file.name.split(".")[0];
 
   const projectPath = path.join("projects", projectName)
+  const updateProjectPaht = path.join(projectPath, projectName)
   fs.mkdirSync(projectPath, { recursive: true });
   fs.mkdirSync("temp", { recursive: true });
   const tempPath = path.join("temp", file.name);
@@ -22,10 +23,10 @@ export const uploadRoutes = new Elysia({prefix: "/upload"})
   fs.writeFileSync(tempPath, buffer);
   const zip = new AdmZip(tempPath);
   zip.extractAllTo(projectPath, true); 
-
+  
   try{
-    await execAsync("npm install", { cwd: projectPath });
-    await execAsync("npm run build", { cwd: projectPath });
+    await execAsync("npm install", { cwd: updateProjectPaht });
+    await execAsync("npm run build", { cwd: updateProjectPaht });
 
   }catch(error){
     console.log("Failed while building Project", error)

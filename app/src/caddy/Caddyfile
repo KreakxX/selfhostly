@@ -1,6 +1,6 @@
 
   :8080 {
-      root * C:/Users/Henri/Videos/selfhostly/app/projects/quickbrowselandingpage/quickbrowselandingpage/out
+      root * C:/Users/Henri/Videos/selfhostly/app/projects/shadaifrontend/shadaifrontend/out
       file_server
       try_files {path} /index.html
   }
